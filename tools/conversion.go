@@ -56,18 +56,26 @@ func ToSummary(qryImportantData *models.Result[models.ImportantData], username s
 	}
 
 	return models.Summary{
-		Username:     username,
-		Use:          useFlow,
-		Total:        totalFlow,
-		Balance:      balance,
-		VoiceUsage:   voiceUsage,
-		VoiceAmount:  voiceAmount,
-		GeneralUse:   generalUse,
-		GeneralTotal: generalTotal,
-		SpecialUse:   specialUse,
-		SpecialTotal: specialTotal,
-		CreateTime:   carbon.DateTime{Carbon: time},
-		Items:        items,
-	}
-
+    Username:     username,
+    Use:          float64(useFlow) / 1024,
+    Total:        float64(totalFlow) / 1024,
+    Balance:      balance,
+    VoiceUsage:   voiceUsage,
+    VoiceAmount:  voiceAmount,
+    GeneralUse:   float64(generalUse) / 1024,
+    GeneralTotal: float64(generalTotal) / 1024,
+    SpecialUse:   float64(specialUse) / 1024,
+    SpecialTotal: float64(specialTotal) / 1024,
+    CreateTime:   carbon.DateTime{Carbon: time},
+    Items: func() []models.SummaryItems {
+        itemsMB := make([]models.SummaryItems, len(items))
+        for i, item := range items {
+            itemsMB[i] = models.SummaryItems{
+                Name:  item.Name,
+                Use:   float64(item.Use) / 1024,
+                Total: float64(item.Total) / 1024,
+            }
+        }
+        return itemsMB
+    }(),
 }
