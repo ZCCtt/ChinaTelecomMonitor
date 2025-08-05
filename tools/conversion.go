@@ -78,6 +78,5 @@ func ToSummary(qryImportantData *models.Result[models.ImportantData], username s
         }
         return itemsMB
     }(),
-
-
+}
 
