@@ -2,11 +2,12 @@ name: Go Release
 
 on:
   push:
-    tags:
-      - 'v*'   # 只有推送 tag 时才自动发布
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  build:
+  build-and-release:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
@@ -29,9 +30,18 @@ jobs:
           tar czvf China_Telecom_Monitor_amd64.tar.gz China_Telecom_Monitor_amd64
           tar czvf China_Telecom_Monitor_arm64.tar.gz China_Telecom_Monitor_arm64
 
+      - name: Generate Release Title and Body
+        id: release_vars
+        run: |
+          echo "RELEASE_TITLE=Auto Release $(date +'%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
+          echo "RELEASE_BODY=自动发布于 $(date +'%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
+
       - name: Create Release and Upload Assets
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: "auto-main-${{ github.run_number }}"
+          name: ${{ env.RELEASE_TITLE }}
+          body: ${{ env.RELEASE_BODY }}
           files: |
             China_Telecom_Monitor_amd64.tar.gz
             China_Telecom_Monitor_arm64.tar.gz
